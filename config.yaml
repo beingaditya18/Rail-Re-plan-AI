@@ -1,0 +1,89 @@
+# ============================================================
+# RailReplan — Configuration
+# ============================================================
+
+corridor:
+  name: "North-Central India Corridor"
+  stations:
+    - { code: NDLS, name: "New Delhi",        km: 0,    platforms: 8, loops: 2 }
+    - { code: MTJ,  name: "Mathura Junction", km: 141,  platforms: 5, loops: 2 }
+    - { code: AGC,  name: "Agra Cantt",       km: 195,  platforms: 6, loops: 2 }
+    - { code: GWL,  name: "Gwalior",          km: 305,  platforms: 5, loops: 2 }
+    - { code: DAA,  name: "Datia",            km: 365,  platforms: 3, loops: 1 }
+    - { code: JHS,  name: "Jhansi Junction",  km: 403,  platforms: 6, loops: 2 }
+    - { code: LAR,  name: "Lalitpur",         km: 458,  platforms: 3, loops: 1 }
+    - { code: BINA, name: "Bina Junction",    km: 534,  platforms: 5, loops: 2 }
+    - { code: BPL,  name: "Bhopal Junction",  km: 702,  platforms: 7, loops: 2 }
+
+simulation:
+  seed: 42
+  tick_minutes: 1
+  default_speed: 60        # x real-time
+  train_count: 35
+  passenger_groups: 3000
+  window_hours: 7           # 05:00 to 12:00
+
+optimization:
+  time_limit_seconds: 10
+  max_negotiation_rounds: 3
+  weights:
+    delay_per_minute: 1.0
+    cancellation_penalty: 500
+    short_termination_penalty: 300
+    platform_change_penalty: 10
+    crew_change_penalty: 20
+    missed_connection_penalty: 50
+    spillover_penalty: 2.0
+
+crew:
+  max_duty_hours: 12
+  min_rest_hours: 8
+  spare_pool_stations: [NDLS, JHS, BPL, AGC]
+  spare_pool_size: 4
+
+train_priorities:
+  VANDE_BHARAT: 100
+  RAJDHANI: 95
+  SUPERFAST: 70
+  MAIL_EXPRESS: 50
+  PASSENGER: 30
+  FREIGHT: 10
+
+headway:
+  double_line_min: 5        # minutes
+  single_line_min: 10       # minutes
+  platform_buffer_min: 3    # minutes
+
+disruption_presets:
+  train_delay:
+    type: TRAIN_DELAY
+    description: "Rajdhani enters corridor 90 minutes late"
+    delay_minutes: 90
+  track_block:
+    type: TRACK_BLOCK
+    description: "One line blocked between GWL and JHS for 2.5 hours"
+    section: [GWL, JHS]
+    duration_minutes: 150
+  fog:
+    type: WEATHER_FOG
+    description: "Dense fog corridor-wide, speed cap 40 km/h"
+    speed_cap_kmph: 40
+    duration_minutes: 240
+    extra_dwell_minutes: 3
+
+alerts:
+  min_change_minutes: 5     # Don't alert for changes < 5 min
+  languages: [en, hi]
+  channels: [sms, app_push, whatsapp, station_pa, display_board]
+
+rag:
+  chunk_size_tokens: 400
+  chunk_overlap_tokens: 50
+  embedding_model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+  top_k: 5
+  serper_cache_ttl_minutes: 30
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  cors_origins: ["http://localhost:5173", "http://localhost:3000"]
